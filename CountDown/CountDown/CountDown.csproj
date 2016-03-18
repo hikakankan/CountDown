@@ -28,7 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
-    <TypeScriptCompile Include="CountDown2015.ts" />
     <TypeScriptCompile Include="CountDown2016.ts" />
   </ItemGroup>
   <ItemGroup>
