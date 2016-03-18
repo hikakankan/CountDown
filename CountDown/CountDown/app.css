@@ -1,0 +1,13 @@
+﻿body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+span {
+    font-style: italic;
+}
+
+#risa {
+	background: transparent url(image/risa24.jpg);
+	background-position: 0px 120px;
+}
+
