@@ -3,29 +3,10 @@
     }
 }
 
-class CountDown2016 {
-    constructor() {
-        this.risaImage.src = "image/okonomi.png";
-        this.risaImage1.src = "image/okonomi1.png";
-        this.risaImage2.src = "image/okonomi2.png";
-        this.mamiriImage.src = "image/merlion.png";
+class CountDownScene {
+    public constructor(private risaImage, private risaImage1, private risaImage2, private mamiriImage) {
     }
 
-    private f_i = 0;
-    private o_i = 0;
-
-    private msg_a: string[] = ["り", "っ", "ち", "ゃ", "ん", "★", "お", "め", "で", "と", "う", "★"];
-    private msg_s: string[] = ["★", "☆"];
-
-    private arg_i = 0;
-    private arg_s = 12.0 * 10;
-    private star_count = 6;
-    private star_period = 20;
-    private star_i = 0;
-
-    private risaImage = new Image();
-    private risaImage1 = new Image();
-    private risaImage2 = new Image();
     private risa_width_org = 200;
     private risa_height_org = 200;
     private risa_count = 0;
@@ -33,11 +14,8 @@ class CountDown2016 {
     private risa_period_2 = 20;
     private risa_period = this.risa_period_1 + this.risa_period_2;
 
-    private mamiriImage = new Image();
     private mamiri_count = 0;
     private mamiri_period = 20;
-    private mamiri_period2 = 40;
-    private mamiri_period3 = 8;
 
     private screen_width = 300;
     private screen_height = 300;
@@ -120,98 +98,7 @@ class CountDown2016 {
         context.drawImage(this.mamiriImage, mamiri2_x, mamiri_y, mamiri_width * r, mamiri_height * r);
     }
 
-    // マーライオンシーン２
-    private mamiri_move_next2(context) {
-        var r = this.mamiri_count / this.mamiri_period2;
-        var r3 = (this.mamiri_count % this.mamiri_period3) / this.mamiri_period3;
-        var mamiri_width = 100;
-        var mamiri_height = 100;
-        var mamiri1_x = (this.screen_width - mamiri_width) * r;
-        var mamiri2_x = (this.screen_width - mamiri_width) * (1 - r);
-        var mamiri1_y = (this.screen_height - mamiri_height) - mamiri_height * (0.25 - (r3 - 0.5) * (r3 - 0.5)) * 4;
-        var mamiri2_y = mamiri1_y;
-        this.mamiri_count = (this.mamiri_count + 1) % this.mamiri_period2;
-        context.drawImage(this.mamiriImage, mamiri1_x, mamiri1_y, mamiri_width, mamiri_height);
-        context.drawImage(this.mamiriImage, mamiri2_x, mamiri1_y, mamiri_width, mamiri_height);
-        context.drawImage(this.mamiriImage, mamiri1_x, mamiri2_y, mamiri_width, mamiri_height);
-        context.drawImage(this.mamiriImage, mamiri2_x, mamiri2_y, mamiri_width, mamiri_height);
-    }
-
-    // シーン２
-    private okonomi_move2(sx, sy, a1, a2, r1, r2, s, context, img) {
-        var cx_new = sx + r1 * Math.cos(a1) + r1 * Math.sin(a1);
-        var cy_new = sy - r1 * Math.sin(a1) + r1 * Math.cos(a1);
-        var cx_new2 = cx_new + r2 * Math.cos(a2) + r2 * Math.sin(a2);
-        var cy_new2 = cy_new - r2 * Math.sin(a2) + r2 * Math.cos(a2);
-        context.drawImage(img, cx_new2 - s, cy_new2 - s, s * 2, s * 2);
-        //context.drawImage(img, sx - s, sy - s, s * 2, s * 2);
-    }
-
-    private happy_birthday(context) {
-        //context.drawImage(risaImage, (screen_width - risa_width_org) / 2, (screen_height - risa_height_org) / 2, risa_width_org, risa_height_org);
-
-        var center_x = this.screen_width / 2;
-        var center_y = this.screen_height / 2;
-
-        var a = this.arg_i / this.arg_s;
-
-        this.okonomi_move2(center_x, center_y, - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
-        this.okonomi_move2(center_x, center_y, Math.PI * 2 * 1 / 5 - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
-        this.okonomi_move2(center_x, center_y, Math.PI * 2 * 2 / 5 - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
-        this.okonomi_move2(center_x, center_y, Math.PI * 2 * 3 / 5 - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
-        this.okonomi_move2(center_x, center_y, Math.PI * 2 * 4 / 5 - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
-
-        // りっちゃんおめでとうの表示
-        context.fillStyle = "#ff6600";
-        for (var i = 0; i < 12; i++) {
-            var arg = Math.PI * 2 * (-a + i / 12.0);
-            var x = Math.cos(arg) * 120 + center_x;
-            var y = Math.sin(arg) * 120 + center_y;
-            context.fillText(this.msg_a[i], x, y);
-        }
-
-        // 星の表示
-        context.fillStyle = "#ffff00";
-        var star_radius = 140;
-        var r = this.star_i / this.star_period;
-        var fs = 10 * (1 - r) + 50 * r;
-        context.font = String(Math.floor(fs)) + "px sans-serif";
-        for (var i = 0; i < 24; i++) {
-            var arg = Math.PI * 2 * (a + i / 24.0);
-            var x = Math.cos(arg) * star_radius * r + center_x;
-            var y = Math.sin(arg) * star_radius * r + center_y;
-            context.fillText(this.msg_s[(Math.floor(this.f_i / this.star_count) + i) % 2], x, y);
-        }
-
-        var n = 7.0;
-        var z = (this.o_i / n) - 1.0;
-        var g = 255 - Math.floor(z * z * 255);
-        context.fillStyle = "rgb(255," + g + ",0)";
-        context.fillText("24歳", center_x, 200);
-
-        this.f_i = (this.f_i + 1) % (this.star_count * 2);
-        this.o_i = (this.o_i + 1) % 12;
-        this.arg_i = (this.arg_i + 1) % this.arg_s;
-        this.star_i = (this.star_i + 1) % this.star_period;
-    }
-
-    public happy_birthday_scene() {
-
-        var mc = <HTMLCanvasElement>document.getElementById("risa-canvas");
-        var context = mc.getContext("2d");
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.shadowBlur = 0;
-        context.font = "40px sans-serif";
-
-        context.clearRect(0, 0, 320, 320);
-
-        this.mamiri_move_next2(context);
-
-        this.happy_birthday(context);
-    }
-
-    public count_down_scene(dbir) {
+    public movePicture(dbir: Date) {
         var dnow = new Date();
         var diff: number = Math.floor((dbir.getTime() - dnow.getTime()) / 1000);
         var sec = diff % 60;
@@ -265,15 +152,144 @@ class CountDown2016 {
         context.fillText(msg_days, x_center, 160);
         context.fillText(msg_time, x_center, 200);
     }
+}
 
-    public go_next(timer) {
+class HappyBirthdayScene {
+    public constructor(private risaImage, private mamiriImage) {
+    }
+
+    private f_i = 0;
+    private o_i = 0;
+
+    private msg_a: string[] = ["り", "っ", "ち", "ゃ", "ん", "★", "お", "め", "で", "と", "う", "★"];
+    private msg_s: string[] = ["★", "☆"];
+
+    private arg_i = 0;
+    private arg_s = 12.0 * 10;
+    private star_count = 6;
+    private star_period = 20;
+    private star_i = 0;
+
+    private mamiri_count = 0;
+    private mamiri_period2 = 40;
+    private mamiri_period3 = 8;
+
+    private screen_width = 300;
+    private screen_height = 300;
+
+    // マーライオンシーン２
+    private mamiri_move_next2(context) {
+        var r = this.mamiri_count / this.mamiri_period2;
+        var r3 = (this.mamiri_count % this.mamiri_period3) / this.mamiri_period3;
+        var mamiri_width = 100;
+        var mamiri_height = 100;
+        var mamiri1_x = (this.screen_width - mamiri_width) * r;
+        var mamiri2_x = (this.screen_width - mamiri_width) * (1 - r);
+        var mamiri1_y = (this.screen_height - mamiri_height) - mamiri_height * (0.25 - (r3 - 0.5) * (r3 - 0.5)) * 4;
+        var mamiri2_y = mamiri1_y;
+        this.mamiri_count = (this.mamiri_count + 1) % this.mamiri_period2;
+        context.drawImage(this.mamiriImage, mamiri1_x, mamiri1_y, mamiri_width, mamiri_height);
+        context.drawImage(this.mamiriImage, mamiri2_x, mamiri1_y, mamiri_width, mamiri_height);
+        context.drawImage(this.mamiriImage, mamiri1_x, mamiri2_y, mamiri_width, mamiri_height);
+        context.drawImage(this.mamiriImage, mamiri2_x, mamiri2_y, mamiri_width, mamiri_height);
+    }
+
+    // シーン２
+    private okonomi_move2(sx, sy, a1, a2, r1, r2, s, context, img) {
+        var cx_new = sx + r1 * Math.cos(a1) + r1 * Math.sin(a1);
+        var cy_new = sy - r1 * Math.sin(a1) + r1 * Math.cos(a1);
+        var cx_new2 = cx_new + r2 * Math.cos(a2) + r2 * Math.sin(a2);
+        var cy_new2 = cy_new - r2 * Math.sin(a2) + r2 * Math.cos(a2);
+        context.drawImage(img, cx_new2 - s, cy_new2 - s, s * 2, s * 2);
+    }
+
+    private happy_birthday(context) {
+        var center_x = this.screen_width / 2;
+        var center_y = this.screen_height / 2;
+
+        var a = this.arg_i / this.arg_s;
+
+        this.okonomi_move2(center_x, center_y, - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
+        this.okonomi_move2(center_x, center_y, Math.PI * 2 * 1 / 5 - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
+        this.okonomi_move2(center_x, center_y, Math.PI * 2 * 2 / 5 - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
+        this.okonomi_move2(center_x, center_y, Math.PI * 2 * 3 / 5 - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
+        this.okonomi_move2(center_x, center_y, Math.PI * 2 * 4 / 5 - a * Math.PI * 4, - a * Math.PI * 24, 100, 20, 25, context, this.risaImage);
+
+        // りっちゃんおめでとうの表示
+        context.fillStyle = "#ff6600";
+        for (var i = 0; i < 12; i++) {
+            var arg = Math.PI * 2 * (-a + i / 12.0);
+            var x = Math.cos(arg) * 120 + center_x;
+            var y = Math.sin(arg) * 120 + center_y;
+            context.fillText(this.msg_a[i], x, y);
+        }
+
+        // 星の表示
+        context.fillStyle = "#ffff00";
+        var star_radius = 140;
+        var r = this.star_i / this.star_period;
+        var fs = 10 * (1 - r) + 50 * r;
+        context.font = String(Math.floor(fs)) + "px sans-serif";
+        for (var i = 0; i < 24; i++) {
+            var arg = Math.PI * 2 * (a + i / 24.0);
+            var x = Math.cos(arg) * star_radius * r + center_x;
+            var y = Math.sin(arg) * star_radius * r + center_y;
+            context.fillText(this.msg_s[(Math.floor(this.f_i / this.star_count) + i) % 2], x, y);
+        }
+
+        var n = 7.0;
+        var z = (this.o_i / n) - 1.0;
+        var g = 255 - Math.floor(z * z * 255);
+        context.fillStyle = "rgb(255," + g + ",0)";
+        context.fillText("24歳", center_x, 200);
+
+        this.f_i = (this.f_i + 1) % (this.star_count * 2);
+        this.o_i = (this.o_i + 1) % 12;
+        this.arg_i = (this.arg_i + 1) % this.arg_s;
+        this.star_i = (this.star_i + 1) % this.star_period;
+    }
+
+    public movePicture() {
+
+        var mc = <HTMLCanvasElement>document.getElementById("risa-canvas");
+        var context = mc.getContext("2d");
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.shadowBlur = 0;
+        context.font = "40px sans-serif";
+
+        context.clearRect(0, 0, 320, 320);
+
+        this.mamiri_move_next2(context);
+
+        this.happy_birthday(context);
+    }
+}
+
+class CountDown2016 {
+    constructor() {
+        this.risaImage.src = "image/okonomi.png";
+        this.risaImage1.src = "image/okonomi1.png";
+        this.risaImage2.src = "image/okonomi2.png";
+        this.mamiriImage.src = "image/merlion.png";
+    }
+
+    private risaImage = new Image();
+    private risaImage1 = new Image();
+    private risaImage2 = new Image();
+    private mamiriImage = new Image();
+
+    private countDownScene = new CountDownScene(this.risaImage, this.risaImage1, this.risaImage2, this.mamiriImage);
+    private happyBirthdayScene = new HappyBirthdayScene(this.risaImage, this.mamiriImage);
+
+    public go_next(setTimeout) {
         var dbir = new Date(2016, 5, 12);
         if (new Date() > dbir) {
-            countdown.happy_birthday_scene();
-            timer.setTimeout(40);
+            this.happyBirthdayScene.movePicture();
+            setTimeout(40);
         } else {
-            countdown.count_down_scene(dbir);
-            timer.setTimeout(100);
+            this.countDownScene.movePicture(dbir);
+            setTimeout(100);
         }
     }
 }
@@ -283,23 +299,12 @@ class Timer {
     private timer = this;
 
     public setTimeout(time) {
-        setTimeout(this.go_next_loop, time);
+        setTimeout(timer.go_next_loop, time);
     }
 
     private go_next() {
-        countdown.go_next(this);
+        countdown.go_next(this.setTimeout);
     }
-
-    //private go_next_() {
-    //    var dbir = new Date(2016, 5, 12);
-    //    if (new Date() > dbir) {
-    //        countdown.happy_birthday_scene();
-    //        setTimeout(this.go_next_loop, 40);
-    //    } else {
-    //        countdown.count_down_scene(dbir);
-    //        setTimeout(this.go_next_loop, 100);
-    //    }
-    //}
 
     private go_next_loop() {
         if (timer.loop_doing) {
