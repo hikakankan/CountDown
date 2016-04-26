@@ -19,6 +19,14 @@ var Rect = (function () {
         var rh = this.height * (1 - r) + destRect.height * r;
         return new Rect(rx, ry, rw, rh);
     };
+    Rect.prototype.moveSin = function (destRect, a) {
+        var r = Math.sin(Math.PI * 2 * a);
+        var rx = this.x + destRect.x * r;
+        var ry = this.y + destRect.y * r;
+        var rw = this.width + destRect.width * r;
+        var rh = this.height + destRect.height * r;
+        return new Rect(rx, ry, rw, rh);
+    };
     Rect.prototype.drawImage = function (image) {
         var mc = document.getElementById("risa-canvas");
         var context = mc.getContext("2d");
@@ -160,20 +168,15 @@ var CountDownOkonomi = (function () {
         var end_height = this.risa_height_org / 2;
         var amplitude = 1;
         var frequency = 1;
-        var risa_width = start_width * (1 - r) + end_width * r;
-        var risa_height = start_height * (1 - r) + end_height * r;
-        var risa_x = start_center_x * (1 - r) + end_center_x * r - risa_width / 2;
-        var risa_y = start_center_y * (1 - r) + end_center_y * r - risa_height / 2 + risa_height * amplitude * Math.sin(Math.PI * 2 * r * frequency);
-        return new Rect(risa_x, risa_y, risa_width, risa_height);
-    };
-    // お好み焼きシーン１ その２
-    CountDownOkonomi.prototype.risa_move_next_2 = function (r) {
-        var start_center_x = this.screen_width / 2;
-        var start_center_y = this.screen_height / 2;
-        var risa_width = this.risa_width_org;
-        var risa_height = this.risa_height_org * (1 - r * 0.9);
-        var risa_x = start_center_x - risa_width / 2;
-        return new Rect(risa_x, start_center_y - this.risa_height_org / 2, risa_width, this.risa_height_org).move(new Rect(0, this.risa_height_org / 2, 0, -this.risa_height_org), r * 0.9);
+        var x0 = start_center_x - start_width / 2;
+        var y0 = start_center_y - start_height / 2;
+        var start_rect = new Rect(x0, y0, start_width, start_height);
+        var x1 = end_center_x - end_width / 2;
+        var y1 = end_center_y - end_height / 2;
+        var end_rect = new Rect(x1, y1, end_width, end_height);
+        var moving_rect = start_rect.moveTo(end_rect, r);
+        var r_rect = new Rect(0, start_height * amplitude, 0, 0).moveTo(new Rect(0, end_height * amplitude, 0, 0), r);
+        return moving_rect.moveSin(r_rect, r * frequency);
     };
     // シーン１
     CountDownOkonomi.prototype.okonomi_move = function (a, a2, rc, context, img) {
@@ -188,6 +191,17 @@ var CountDownOkonomi = (function () {
         context.rotate(a2);
         context.drawImage(img, rc.x + cx_new2 - cx, rc.y + cy_new2 - cy, rc.width, rc.height);
         context.rotate(-a2);
+    };
+    // お好み焼きシーン１ その２
+    CountDownOkonomi.prototype.risa_move_next_2 = function (r) {
+        var start_center_x = this.screen_width / 2;
+        var start_center_y = this.screen_height / 2;
+        var risa_width = this.risa_width_org;
+        var risa_height = this.risa_height_org * (1 - r * 0.9);
+        var risa_x = start_center_x - risa_width / 2;
+        var start_rect = new Rect(risa_x, start_center_y - this.risa_height_org / 2, risa_width, this.risa_height_org);
+        var diff_rect = new Rect(0, this.risa_height_org / 2, 0, -this.risa_height_org);
+        return start_rect.move(diff_rect, r * 0.9);
     };
     CountDownOkonomi.prototype.show = function () {
         var mc = document.getElementById("risa-canvas");
