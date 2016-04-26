@@ -1,0 +1,6 @@
+C:\furuta\repository\CountDown\CountDown\CountDown\bin\CountDown.dll.config
+C:\furuta\repository\CountDown\CountDown\CountDown\bin\CountDown.dll
+C:\furuta\repository\CountDown\CountDown\CountDown\bin\CountDown.pdb
+C:\furuta\repository\CountDown\CountDown\CountDown\obj\Debug\CountDown.csprojResolveAssemblyReference.cache
+C:\furuta\repository\CountDown\CountDown\CountDown\obj\Debug\CountDown.dll
+C:\furuta\repository\CountDown\CountDown\CountDown\obj\Debug\CountDown.pdb
