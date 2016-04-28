@@ -1,7 +1,24 @@
-﻿class Rect {
+﻿enum MoveType { Up, Down, Sin, Cos };
+
+class Rect {
     public constructor(public x: number, public y: number, public width: number, public height: number) {
     }
-    public move(diffRect: Rect, r: number): Rect {
+    public move(moveType: MoveType, diffRect: Rect, a: number): Rect {
+        var r: number;
+        switch (moveType) {
+            case MoveType.Up:
+                r = a;
+                break;
+            case MoveType.Down:
+                r = -a;
+                break;
+            case MoveType.Sin:
+                r = Math.sin(Math.PI * 2 * a);
+                break;
+            case MoveType.Cos:
+                r = Math.cos(Math.PI * 2 * a);
+                break;
+        }
         var rx = this.x + diffRect.x * r;
         var ry = this.y + diffRect.y * r;
         var rw = this.width + diffRect.width * r;
@@ -9,19 +26,7 @@
         return new Rect(rx, ry, rw, rh);
     }
     public moveTo(destRect: Rect, r: number): Rect {
-        var rx = this.x * (1 - r) + destRect.x * r;
-        var ry = this.y * (1 - r) + destRect.y * r;
-        var rw = this.width * (1 - r) + destRect.width * r;
-        var rh = this.height * (1 - r) + destRect.height * r;
-        return new Rect(rx, ry, rw, rh);
-    }
-    public moveSin(destRect: Rect, a: number): Rect {
-        var r = Math.sin(Math.PI * 2 * a);
-        var rx = this.x + destRect.x * r;
-        var ry = this.y + destRect.y * r;
-        var rw = this.width + destRect.width * r;
-        var rh = this.height + destRect.height * r;
-        return new Rect(rx, ry, rw, rh);
+        return this.move(MoveType.Up, new Rect(destRect.x - this.x, destRect.y - this.y, destRect.width - this.width, destRect.height - this.height), r);
     }
     public drawImage(image: HTMLImageElement): void {
         var mc: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("risa-canvas");
@@ -167,29 +172,32 @@ class CountDownOkonomi {
         var amplitude: number = 1;
         var frequency: number = 1;
 
-        var x0: number = start_center_x - start_width / 2;
-        var y0: number = start_center_y - start_height / 2;
-        var start_rect = new Rect(x0, y0, start_width, start_height);
-
-        var x1: number = end_center_x - end_width / 2;
-        var y1: number = end_center_y - end_height / 2;
-        var end_rect = new Rect(x1, y1, end_width, end_height);
-
+        var start_rect = new Rect(start_center_x - start_width / 2, start_center_y - start_height / 2, start_width, start_height);
+        var end_rect = new Rect(end_center_x - end_width / 2, end_center_y - end_height / 2, end_width, end_height);
         var moving_rect = start_rect.moveTo(end_rect, r);
 
         var r_rect = new Rect(0, start_height * amplitude, 0, 0).moveTo(new Rect(0, end_height * amplitude, 0, 0), r);
 
-        return moving_rect.moveSin(r_rect, r * frequency);
+        return moving_rect.move(MoveType.Sin, r_rect, r * frequency);
     }
 
     // シーン１
+    // (0, 0) を中心とした 角度 α の回転を R(α) とする。
+    // (a, b) を中心として (c, d) を角度 α 回転させると R(α)(c - a, d - b) + (a, b) に写る。
+    // (0, 0) を中心として (x, y) を角度 α 回転させると R(α)(x, y) に写る。
+    // R(α)(x, y) = R(α)(c - a, d - b) + (a, b) とすると
+    // (x, y) = R(-α)(R(α)(c - a, d - b) + (a, b)) = (c, d) - (a, b) + R(-α)(a, b)
     private okonomi_move(a: number, a2: number, rc: Rect, context: CanvasRenderingContext2D, img: HTMLImageElement): void {
+        // (cx, cy) 図形の中心
         var cx: number = rc.x + rc.width / 2
         var cy: number = rc.y + rc.height / 2
+        // (sx, sy) 画面の中心
         var sx: number = this.screen_width / 2;
         var sy: number = this.screen_height / 2;
+        // (cx_new, cy_new) = (sx, sy) - R(a)((cx, cy) - (sx, sy))
         var cx_new: number = sx + (cx - sx) * Math.cos(a) + (cy - sy) * Math.sin(a);
         var cy_new: number = sy - (cx - sx) * Math.sin(a) + (cy - sy) * Math.cos(a);
+        // (cx_new2, cy_new2) = - R(a2)(cx_new, cy_new)
         var cx_new2: number = cx_new * Math.cos(a2) + cy_new * Math.sin(a2);
         var cy_new2: number = - cx_new * Math.sin(a2) + cy_new * Math.cos(a2);
         context.rotate(a2);
@@ -206,7 +214,7 @@ class CountDownOkonomi {
         var risa_x: number = start_center_x - risa_width / 2;
         var start_rect = new Rect(risa_x, start_center_y - this.risa_height_org / 2, risa_width, this.risa_height_org);
         var diff_rect = new Rect(0, this.risa_height_org / 2, 0, -this.risa_height_org);
-        return start_rect.move(diff_rect, r * 0.9);
+        return start_rect.move(MoveType.Up, diff_rect, r * 0.9);
     }
 
     public show(): void {
@@ -259,8 +267,8 @@ class CountDownMerlion {
     public show(): void {
         var r: number = this.loop.getValue();
         this.loop.next();
-        this.init_rect1.move(this.diff_rect, r).drawImage(this.mamiriImage);
-        this.init_rect2.move(this.diff_rect, r).drawImage(this.mamiriImage);
+        this.init_rect1.move(MoveType.Up, this.diff_rect, r).drawImage(this.mamiriImage);
+        this.init_rect2.move(MoveType.Up, this.diff_rect, r).drawImage(this.mamiriImage);
     }
 }
 
